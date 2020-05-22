@@ -1,8 +1,9 @@
 import React from 'react';
 import './App.css';
+import ViewCountries from './containers/ViewCountries';
 
 function App() {
-  return <div className="App"></div>;
+  return <ViewCountries />;
 }
 
 export default App;
