@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { symbols } from '../themes/symbols';
 import {
   Title,
@@ -6,8 +6,26 @@ import {
   Small,
   Caption,
 } from '../components/typography/Typography';
+import { useQuery } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
+
+const COUNTRIES = gql`
+  {
+    countries {
+      name
+      capital
+      emoji
+      currency
+      languages {
+        name
+      }
+    }
+  }
+`;
 
 const ViewCountries = () => {
+  const { loading, error, data } = useQuery(COUNTRIES);
+
   return (
     <>
       <div>
