@@ -4,6 +4,7 @@ import { ApolloClient } from 'apollo-boost';
 import { createHttpLink } from 'apollo-link-http';
 import { ApolloLink } from 'apollo-link';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { Container } from '@material-ui/core';
 
 import './App.css';
 import ViewCountries from './containers/ViewCountries';
@@ -22,7 +23,9 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
-      <ViewCountries />
+      <Container>
+        <ViewCountries />
+      </Container>
     </ApolloProvider>
   );
 }

@@ -1,6 +1,16 @@
 import { rem } from '../utils';
 
 export const symbols = {
+  borders: {
+    radius: {
+      _4: '4px',
+      _50: '50px',
+    },
+    shadows: {
+      _2: '2px',
+      _4: '4px',
+    },
+  },
   colors: {
     brand: 'rgba(0, 43, 85, 1)',
     accent1: 'rgba(0, 90, 173, 1)',
@@ -10,7 +20,9 @@ export const symbols = {
     positive: 'rgba(0, 139, 0, 1)',
     currency: 'rgb(255, 193, 7, 1)',
     black: 'rgba(0, 0, 0, 1)',
+    black01: 'rgba(0, 0, 0, 0.1)',
     white: 'rgba(255, 255, 255, 1)',
+    white0: 'rgba(255, 255, 255, 0)',
   },
   font: {
     colors: {
@@ -23,6 +35,8 @@ export const symbols = {
     },
     lineHeight: {
       _32: rem(32),
+      _40: rem(40),
+      _100: rem(72),
     },
     size: {
       _10: rem(10),
@@ -31,7 +45,27 @@ export const symbols = {
     },
     weight: {
       regular: 400,
+      semiBold: 600,
       bold: 700,
     },
+  },
+  media: {
+    mobileDevice: '320px',
+    tabletDevice: '768px',
+  },
+  size: {
+    flagSizeSmall: rem(56),
+    flagSizeLarge: rem(100),
+  },
+  spacing: {
+    _2: rem(2),
+    _4: rem(4),
+    _6: rem(6),
+    _8: rem(8),
+    _10: rem(10),
+    _12: rem(12),
+    _16: rem(16),
+    _20: rem(20),
+    _26: rem(26),
   },
 };

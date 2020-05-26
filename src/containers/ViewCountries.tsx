@@ -1,22 +1,37 @@
-import React, { useEffect } from 'react';
-import { symbols } from '../themes/symbols';
-import {
-  Title,
-  SmallBold,
-  Small,
-  Caption,
-} from '../components/typography/Typography';
+import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import CountryCard from '../components/CountryCard/CountryCard';
+import { LoadingSpinner } from '../components/Spinner/styles';
+import styled from 'styled-components';
+
+export interface Languages {
+  name: string;
+  code: string;
+}
+
+export interface Countries {
+  name: number;
+  capital: string;
+  emoji: string;
+  currency: number;
+  languages: Languages[];
+}
+
+interface CountriesData {
+  countries: Countries[];
+}
 
 const COUNTRIES = gql`
   {
     countries {
       name
+      native
       capital
       emoji
       currency
       languages {
+        code
         name
       }
     }
@@ -24,30 +39,30 @@ const COUNTRIES = gql`
 `;
 
 const ViewCountries = () => {
-  const { loading, error, data } = useQuery(COUNTRIES);
+  const { loading, error, data } = useQuery<CountriesData>(COUNTRIES);
+
+  const getLanguages = (languages: Languages[]) =>
+    languages.map((language) => language.name).join(', ');
 
   return (
     <>
-      <div>
-        <p style={{ color: symbols.font.colors.primary }}>Hello</p>
-        <p style={{ color: symbols.font.colors.secondary }}>Hello</p>
-        <p style={{ color: symbols.font.colors.tertiary }}>Hello</p>
-        <p style={{ color: symbols.colors.brand }}>Hello</p>
-        <p style={{ color: symbols.colors.accent1 }}>Hello</p>
-        <p style={{ color: symbols.colors.accent2 }}>Hello</p>
-        <p style={{ color: symbols.colors.neutral }}>Hello</p>
-        <p style={{ color: symbols.colors.shade }}>Hello</p>
-        <p style={{ color: symbols.colors.positive }}>Hello</p>
-        <p style={{ color: symbols.colors.currency }}>Hello</p>
-        <p style={{ color: symbols.colors.black }}>Hello</p>
-        <p style={{ color: symbols.colors.white }}>Hello</p>
-      </div>
-      <div>
-        <Title>Hello</Title>
-        <Caption>Hello</Caption>
-        <Small>Hello</Small>
-        <SmallBold>Hello</SmallBold>
-      </div>
+      {data && !loading ? (
+        data.countries.map((country) => {
+          return (
+            <>
+              <CountryCard
+                name={country.name}
+                capital={country.capital}
+                emoji={country.emoji}
+                currency={country.currency}
+                languages={getLanguages(country.languages)}
+              />
+            </>
+          );
+        })
+      ) : (
+        <LoadingSpinner />
+      )}
     </>
   );
 };
