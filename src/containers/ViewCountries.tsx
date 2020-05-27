@@ -5,6 +5,9 @@ import { useQuery } from '@apollo/react-hooks';
 import CountryCard from '../components/CountryCard/CountryCard';
 import Input from '../components/Input/Input';
 import { LoadingSpinner } from '../components/Spinner/styles';
+import { FilterButtonRow } from './styles';
+import Button from '../components/Button/Button';
+import { symbols } from '../themes/symbols';
 
 export interface Languages {
   name: string;
@@ -65,6 +68,15 @@ const ViewCountries = () => {
   return (
     <>
       <Input onTextChange={(value) => handleSearchInputChange(value)} />
+      <FilterButtonRow>
+        <Button
+          onClick={() => console.log('Hi')}
+          marginStyle={{ marginRight: symbols.spacing._12 }}
+        >
+          All languages
+        </Button>
+        <Button onClick={() => console.log('Hi')}>Sort A - Z</Button>
+      </FilterButtonRow>
       {filteredCountries && !loading ? (
         filteredCountries.map((country) => {
           return (

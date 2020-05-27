@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { symbols } from '../../themes/symbols';
 
 export const InputContainer = styled.div`
-  margin: ${symbols.spacing._32} 0;
+  margin: ${symbols.spacing._32} 0 ${symbols.spacing._12};
   position: relative;
   display: flex;
   align-items: center;
