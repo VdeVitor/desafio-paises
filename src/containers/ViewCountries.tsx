@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import CountryCard from '../components/CountryCard/CountryCard';
 import { LoadingSpinner } from '../components/Spinner/styles';
-import styled from 'styled-components';
+import Input from '../components/Input/Input';
 
 export interface Languages {
   name: string;
@@ -46,6 +46,7 @@ const ViewCountries = () => {
 
   return (
     <>
+      <Input />
       {data && !loading ? (
         data.countries.map((country) => {
           return (

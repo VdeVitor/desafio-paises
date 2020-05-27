@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import Button from '@material-ui/core/Button';
-import { Card as MaterialCard } from '@material-ui/core';
+import { Card as MuiCard } from '@material-ui/core';
 import { symbols } from '../../themes/symbols';
 import { Title } from '../Typography/Typography';
 
-export const Card = styled(MaterialCard)`
+export const Card = styled(MuiCard)`
   display: flex;
   flex-direction: column;
   padding: ${symbols.spacing._12} ${symbols.spacing._12} ${symbols.spacing._16}
@@ -13,7 +13,7 @@ export const Card = styled(MaterialCard)`
   border-radius: 4px;
   box-shadow: 0 ${symbols.borders.shadows._2} ${symbols.borders.shadows._4} 0
     ${symbols.colors.black01};
-  background-color: ${symbols.colors.white0};
+  background-color: ${symbols.colors.white};
 
   @media (min-width: ${symbols.media.tabletDevice}) {
     padding-bottom: ${symbols.spacing._12};

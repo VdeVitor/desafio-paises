@@ -22,7 +22,6 @@ export const symbols = {
     black: 'rgba(0, 0, 0, 1)',
     black01: 'rgba(0, 0, 0, 0.1)',
     white: 'rgba(255, 255, 255, 1)',
-    white0: 'rgba(255, 255, 255, 0)',
   },
   font: {
     colors: {
@@ -34,6 +33,7 @@ export const symbols = {
       lato: 'Lato, sans-serif',
     },
     lineHeight: {
+      _24: rem(24),
       _32: rem(32),
       _40: rem(40),
       _100: rem(72),
@@ -41,6 +41,7 @@ export const symbols = {
     size: {
       _10: rem(10),
       _12: rem(12),
+      _16: rem(16),
       _20: rem(20),
     },
     weight: {
@@ -56,6 +57,7 @@ export const symbols = {
   size: {
     flagSizeSmall: rem(56),
     flagSizeLarge: rem(100),
+    inputHeight: rem(50),
   },
   spacing: {
     _2: rem(2),
@@ -67,5 +69,7 @@ export const symbols = {
     _16: rem(16),
     _20: rem(20),
     _26: rem(26),
+    _32: rem(32),
+    _52: rem(52),
   },
 };
