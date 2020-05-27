@@ -18,7 +18,7 @@ const CountryCard = ({
   currency,
   languages,
 }: {
-  name: number;
+  name: string;
   capital: string;
   emoji: string;
   currency: number;

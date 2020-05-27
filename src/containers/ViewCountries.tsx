@@ -1,9 +1,10 @@
-import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import React, { useCallback, useState } from 'react';
 import gql from 'graphql-tag';
+import { useQuery } from '@apollo/react-hooks';
+
 import CountryCard from '../components/CountryCard/CountryCard';
-import { LoadingSpinner } from '../components/Spinner/styles';
 import Input from '../components/Input/Input';
+import { LoadingSpinner } from '../components/Spinner/styles';
 
 export interface Languages {
   name: string;
@@ -11,7 +12,7 @@ export interface Languages {
 }
 
 export interface Countries {
-  name: number;
+  name: string;
   capital: string;
   emoji: string;
   currency: number;
@@ -40,25 +41,41 @@ const COUNTRIES = gql`
 
 const ViewCountries = () => {
   const { loading, error, data } = useQuery<CountriesData>(COUNTRIES);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  /** CALLBACKS */
 
   const getLanguages = (languages: Languages[]) =>
     languages.map((language) => language.name).join(', ');
 
+  const handleSearchInputChange = useCallback((searchTermValue) => {
+    setSearchTerm(searchTermValue);
+  }, []);
+
+  /** DERIVED STATE */
+
+  const filteredCountries = data
+    ? data.countries.filter((country) => {
+        return (
+          country.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+        );
+      })
+    : [];
+
   return (
     <>
-      <Input />
-      {data && !loading ? (
-        data.countries.map((country) => {
+      <Input onTextChange={(value) => handleSearchInputChange(value)} />
+      {filteredCountries && !loading ? (
+        filteredCountries.map((country) => {
           return (
-            <>
-              <CountryCard
-                name={country.name}
-                capital={country.capital}
-                emoji={country.emoji}
-                currency={country.currency}
-                languages={getLanguages(country.languages)}
-              />
-            </>
+            <CountryCard
+              key={country.name}
+              name={country.name}
+              capital={country.capital}
+              emoji={country.emoji}
+              currency={country.currency}
+              languages={getLanguages(country.languages)}
+            />
           );
         })
       ) : (

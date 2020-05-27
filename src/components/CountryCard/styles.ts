@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import Button from '@material-ui/core/Button';
 import { Card as MuiCard } from '@material-ui/core';
 import { symbols } from '../../themes/symbols';
 import { Title } from '../Typography/Typography';
