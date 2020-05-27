@@ -4,7 +4,10 @@ import { symbols } from '../../themes/symbols';
 
 export const InputContainer = styled.div`
   margin: ${symbols.spacing._32} 0;
+  position: relative;
   display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const InputField = styled(MuiInput)`

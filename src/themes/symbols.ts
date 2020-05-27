@@ -58,6 +58,7 @@ export const symbols = {
     flagSizeSmall: rem(56),
     flagSizeLarge: rem(100),
     inputHeight: rem(50),
+    icon: rem(24),
   },
   spacing: {
     _2: rem(2),
