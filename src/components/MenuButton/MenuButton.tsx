@@ -9,7 +9,7 @@ const MenuButton = ({
   title,
   onItemClicked,
 }: {
-  onItemClicked: (item: string) => void;
+  onItemClicked: (item: string, callback: () => void) => void;
   listData: any;
   title: string;
 }) => {
@@ -49,7 +49,7 @@ const MenuButton = ({
         }}
       >
         {listData.map((item: any) => (
-          <MenuItem key={item} onClick={() => onItemClicked(item)}>
+          <MenuItem key={item} onClick={() => onItemClicked(item, handleClose)}>
             {item}
           </MenuItem>
         ))}

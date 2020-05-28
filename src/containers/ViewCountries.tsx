@@ -6,9 +6,6 @@ import CountryCard from '../components/CountryCard/CountryCard';
 import Input from '../components/Input/Input';
 import { LoadingSpinner } from '../components/Spinner/styles';
 import { FilterButtonRow } from './styles';
-import Button from '../components/Button/Button';
-import { symbols } from '../themes/symbols';
-import MenuList from '../components/MenuButton/MenuButton';
 import MenuButton from '../components/MenuButton/MenuButton';
 
 export interface Languages {
@@ -45,13 +42,20 @@ const COUNTRIES = gql`
 `;
 
 const ViewCountries = () => {
-  const [countriesData, setCountriesData] = useState<CountriesData>();
-  const { loading, error, data } = useQuery<CountriesData>(COUNTRIES, {
-    onCompleted: setCountriesData,
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterValue, setFilterValue] = useState('');
-  const [sortValue, setSortValue] = useState('');
+  const [countriesData, setCountriesData] = useState<Countries[]>();
+  const { loading, error, data } = useQuery<CountriesData>(COUNTRIES);
+  const [order, setOrder] = useState<null | number>(null);
+  const [filterTerm, setFilterTerm] = useState('');
+  const [selectedFilterText, setSelectedFilterText] = useState('All languages');
+  const [selectedSortText, setSelectedSortText] = useState('Sort A-Z');
+
+  /** EFFECTS */
+
+  useEffect(() => {
+    if (data) {
+      setCountriesData(data.countries);
+    }
+  }, [data]);
 
   /** CALLBACKS */
 
@@ -61,26 +65,63 @@ const ViewCountries = () => {
     []
   );
 
-  const handleSearchInputChange = useCallback((searchTermValue) => {
-    setSearchTerm(searchTermValue);
-  }, []);
+  const handleSearchInputChange = useCallback(
+    (searchTermValue) => {
+      const filtered = data
+        ? data.countries.filter(
+            (country) =>
+              country.name
+                .toLowerCase()
+                .indexOf(searchTermValue.toLowerCase()) !== -1
+          )
+        : [...countriesData];
 
-  /** DERIVED STATE */
+      setCountriesData(filtered);
+    },
+    [countriesData]
+  );
 
-  const filteredCountries = countriesData
-    ? countriesData.countries.filter((country) => {
-        return (
-          country.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-        );
-      })
-    : [];
+  const handleFilterPress = useCallback(
+    (selectedFilterTerm, closeMenuCallback) => {
+      closeMenuCallback();
+      setFilterTerm(selectedFilterTerm);
+      setSelectedFilterText(selectedFilterTerm);
+    },
+    [order]
+  );
 
-  const getLanguageArrayList = countriesData
-    ? countriesData.countries.reduce<string[]>(
+  const handleSortChange = useCallback(
+    (direction, closeMenuCallback) => {
+      closeMenuCallback();
+
+      if (direction.toLowerCase() === 'descending') {
+        setSelectedSortText('Z-A');
+        return setOrder(1);
+      }
+
+      setSelectedSortText('A-Z');
+    },
+    [order, selectedSortText]
+  );
+
+  /** STATE */
+
+  const getLanguageArrayList = data
+    ? data.countries.reduce<string[]>(
         (a, b) => [...a, ...b.languages.map(({ name }) => name)],
         []
       )
     : [];
+
+  const sortedCountriesData =
+    order === 1 && countriesData ? countriesData.reverse() : countriesData;
+
+  const derivedCountriesData =
+    filterTerm && sortedCountriesData
+      ? sortedCountriesData.filter((x) =>
+          x.languages.some((g) => filterTerm.includes(g.name))
+        )
+      : sortedCountriesData;
 
   return (
     <>
@@ -88,17 +129,17 @@ const ViewCountries = () => {
       <FilterButtonRow>
         <MenuButton
           listData={[...new Set(getLanguageArrayList)]}
-          title="All languages"
-          onItemClicked={setFilterValue}
+          title={selectedFilterText}
+          onItemClicked={handleFilterPress}
         />
         <MenuButton
           listData={['Ascending', 'Descending']}
-          title="Sort A-Z"
-          onItemClicked={setSortValue}
+          title={selectedSortText}
+          onItemClicked={handleSortChange}
         />
       </FilterButtonRow>
-      {filteredCountries && !loading ? (
-        filteredCountries.map((country) => {
+      {derivedCountriesData && !loading ? (
+        derivedCountriesData.map((country) => {
           return (
             <CountryCard
               key={country.name}
