@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 
@@ -8,6 +8,8 @@ import { LoadingSpinner } from '../components/Spinner/styles';
 import { FilterButtonRow } from './styles';
 import Button from '../components/Button/Button';
 import { symbols } from '../themes/symbols';
+import MenuList from '../components/MenuButton/MenuButton';
+import MenuButton from '../components/MenuButton/MenuButton';
 
 export interface Languages {
   name: string;
@@ -43,13 +45,21 @@ const COUNTRIES = gql`
 `;
 
 const ViewCountries = () => {
-  const { loading, error, data } = useQuery<CountriesData>(COUNTRIES);
+  const [countriesData, setCountriesData] = useState<CountriesData>();
+  const { loading, error, data } = useQuery<CountriesData>(COUNTRIES, {
+    onCompleted: setCountriesData,
+  });
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterValue, setFilterValue] = useState('');
+  const [sortValue, setSortValue] = useState('');
 
   /** CALLBACKS */
 
-  const getLanguages = (languages: Languages[]) =>
-    languages.map((language) => language.name).join(', ');
+  const getLanguages = useCallback(
+    (languages: Languages[]) =>
+      languages.map((language) => language.name).join(', '),
+    []
+  );
 
   const handleSearchInputChange = useCallback((searchTermValue) => {
     setSearchTerm(searchTermValue);
@@ -57,25 +67,35 @@ const ViewCountries = () => {
 
   /** DERIVED STATE */
 
-  const filteredCountries = data
-    ? data.countries.filter((country) => {
+  const filteredCountries = countriesData
+    ? countriesData.countries.filter((country) => {
         return (
           country.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
         );
       })
     : [];
 
+  const getLanguageArrayList = countriesData
+    ? countriesData.countries.reduce<string[]>(
+        (a, b) => [...a, ...b.languages.map(({ name }) => name)],
+        []
+      )
+    : [];
+
   return (
     <>
       <Input onTextChange={(value) => handleSearchInputChange(value)} />
       <FilterButtonRow>
-        <Button
-          onClick={() => console.log('Hi')}
-          marginStyle={{ marginRight: symbols.spacing._12 }}
-        >
-          All languages
-        </Button>
-        <Button onClick={() => console.log('Hi')}>Sort A - Z</Button>
+        <MenuButton
+          listData={[...new Set(getLanguageArrayList)]}
+          title="All languages"
+          onItemClicked={setFilterValue}
+        />
+        <MenuButton
+          listData={['Ascending', 'Descending']}
+          title="Sort A-Z"
+          onItemClicked={setSortValue}
+        />
       </FilterButtonRow>
       {filteredCountries && !loading ? (
         filteredCountries.map((country) => {

@@ -58,6 +58,7 @@ export const symbols = {
     flagSizeSmall: rem(56),
     flagSizeLarge: rem(100),
     inputHeight: rem(50),
+    maxMenuHeight: rem(260),
     icon: rem(24),
   },
   spacing: {
@@ -71,6 +72,7 @@ export const symbols = {
     _20: rem(20),
     _26: rem(26),
     _32: rem(32),
+    _48: rem(48),
     _52: rem(52),
   },
 };
