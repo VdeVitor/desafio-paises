@@ -24,15 +24,14 @@ export const Row = styled.div`
   flex-direction: row;
 `;
 
-export const Flag = styled.span`
-  font-size: ${symbols.size.flagSizeSmall};
-  line-height: ${symbols.font.lineHeight._40};
-  margin-right: ${symbols.spacing._26};
-  margin-bottom: ${symbols.spacing._16};
-
+export const Flag = styled.span<{ imageSource: string }>`
+  background: ${(props) => `url('${props.imageSource}')`};
+  background-size: cover;
+  width: ${symbols.size.flagWidth};
+  height: ${symbols.size.flagHeight};
+  border-radius: ${symbols.borders.radius._6};
+  margin-right: ${symbols.spacing._24};
   @media (min-width: ${symbols.media.tabletDevice}) {
-    font-size: ${symbols.size.flagSizeLarge};
-    line-height: ${symbols.font.lineHeight._100};
   }
 `;
 

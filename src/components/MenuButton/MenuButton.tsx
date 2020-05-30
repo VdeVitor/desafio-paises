@@ -4,15 +4,13 @@ import Button from '../Button/Button';
 import { symbols } from '../../themes/symbols';
 import { Menu } from './styles';
 
-const MenuButton = ({
-  listData,
-  title,
-  onItemClicked,
-}: {
+interface Props {
   onItemClicked: (item: string, callback: () => void) => void;
   listData: any;
   title: string;
-}) => {
+}
+
+const MenuButton = ({ listData, title, onItemClicked }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [buttonSelected, setButtonSelected] = useState(false);
   const open = Boolean(anchorEl);

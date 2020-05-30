@@ -8,149 +8,183 @@ import { LoadingSpinner } from '../components/Spinner/styles';
 import { FilterButtonRow } from './styles';
 import MenuButton from '../components/MenuButton/MenuButton';
 
-export interface Languages {
+interface Languages {
   name: string;
   code: string;
 }
 
-export interface Countries {
-  name: string;
-  capital: string;
-  emoji: string;
-  currency: number;
-  languages: Languages[];
+interface Flag {
+  svgFile: string;
 }
 
-interface CountriesData {
-  countries: Countries[];
+interface Currency {
+  name: string;
+  symbol: string;
 }
+
+export interface Country {
+  name: string;
+  capital: string;
+  flag: Flag;
+  currencies: Currency[];
+  officialLanguages: Languages[];
+}
+
+export interface Countries {
+  Country: Country[];
+}
+
+enum OptionTypes {
+  SortByAlphabet = 'Sort A-Z',
+  SortByDistance = 'Sort by distance (closest)',
+  SortByPopulation = 'Sort by population (highest)',
+  FilterAllLanguages = 'All languages',
+}
+
+const SORT_OPTIONS = [
+  'Sort A-Z',
+  'Sort by distance (closest)',
+  'Sort by population (highest)',
+];
 
 const COUNTRIES = gql`
   {
-    countries {
+    Country {
       name
-      native
+      population
+      populationDensity
       capital
-      emoji
-      currency
-      languages {
-        code
+      location {
+        latitude
+        longitude
+      }
+      numericCode
+      subregion {
         name
+        region {
+          name
+        }
+      }
+      officialLanguages {
+        iso639_1
+        iso639_2
+        name
+        nativeName
+      }
+      currencies {
+        name
+        symbol
+      }
+      flag {
+        svgFile
       }
     }
   }
 `;
 
 const ViewCountries = () => {
-  const [countriesData, setCountriesData] = useState<Countries[]>();
-  const { loading, error, data } = useQuery<CountriesData>(COUNTRIES);
-  const [order, setOrder] = useState<null | number>(null);
+  const { loading, error, data } = useQuery<Countries>(COUNTRIES);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [sortedCountries, setSortedCountries] = useState<Country[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [filterTerm, setFilterTerm] = useState('');
-  const [selectedFilterText, setSelectedFilterText] = useState('All languages');
-  const [selectedSortText, setSelectedSortText] = useState('Sort A-Z');
+  const [selectedSort, setSelectedSort] = useState('');
 
-  /** EFFECTS */
+  useEffect(() => {
+    setFilterTerm(OptionTypes.FilterAllLanguages);
+    setSelectedSort(OptionTypes.SortByAlphabet);
+  }, []);
 
   useEffect(() => {
     if (data) {
-      setCountriesData(data.countries);
+      setCountries(data.Country);
     }
   }, [data]);
 
-  /** CALLBACKS */
+  useEffect(() => {
+    let result = [...countries];
 
-  const getLanguages = useCallback(
+    if (searchTerm) {
+      result = result.filter(
+        (country) =>
+          country.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+      );
+    }
+
+    if (filterTerm && filterTerm !== OptionTypes.FilterAllLanguages) {
+      result = result.filter((country) =>
+        country.officialLanguages.some((g) => filterTerm.includes(g.name))
+      );
+    }
+
+    if (selectedSort === OptionTypes.SortByAlphabet) {
+      result = result.sort((a, b) =>
+        a.name !== b.name ? (a.name < b.name ? -1 : 1) : 0
+      );
+    }
+
+    setSortedCountries(result);
+  }, [searchTerm, countries, filterTerm, selectedSort]);
+
+  const getFormattedLanguages = useCallback(
     (languages: Languages[]) =>
       languages.map((language) => language.name).join(', '),
     []
   );
 
-  const handleSearchInputChange = useCallback(
-    (searchTermValue) => {
-      const filtered = data
-        ? data.countries.filter(
-            (country) =>
-              country.name
-                .toLowerCase()
-                .indexOf(searchTermValue.toLowerCase()) !== -1
-          )
-        : [...countriesData];
-
-      setCountriesData(filtered);
-    },
-    [countriesData]
+  const getCurrencySymbol = useCallback(
+    (currencies: Currency[]) => currencies.map((currency) => currency.symbol),
+    []
   );
 
-  const handleFilterPress = useCallback(
-    (selectedFilterTerm, closeMenuCallback) => {
-      closeMenuCallback();
-      setFilterTerm(selectedFilterTerm);
-      setSelectedFilterText(selectedFilterTerm);
-    },
-    [order]
+  const handleFilter = useCallback((filterTerm, callback) => {
+    callback();
+    setFilterTerm(filterTerm);
+  }, []);
+
+  const handleSort = useCallback((sortType, callback) => {
+    callback();
+    setSelectedSort(sortType);
+  }, []);
+
+  const getLanguageArrayList = data?.Country.reduce<string[]>(
+    (a, b) => [...a, ...b.officialLanguages.map(({ name }) => name)],
+    []
   );
-
-  const handleSortChange = useCallback(
-    (direction, closeMenuCallback) => {
-      closeMenuCallback();
-
-      if (direction.toLowerCase() === 'descending') {
-        setSelectedSortText('Z-A');
-        return setOrder(1);
-      }
-
-      setSelectedSortText('A-Z');
-    },
-    [order, selectedSortText]
-  );
-
-  /** STATE */
-
-  const getLanguageArrayList = data
-    ? data.countries.reduce<string[]>(
-        (a, b) => [...a, ...b.languages.map(({ name }) => name)],
-        []
-      )
-    : [];
-
-  const sortedCountriesData =
-    order === 1 && countriesData ? countriesData.reverse() : countriesData;
-
-  const derivedCountriesData =
-    filterTerm && sortedCountriesData
-      ? sortedCountriesData.filter((x) =>
-          x.languages.some((g) => filterTerm.includes(g.name))
-        )
-      : sortedCountriesData;
 
   return (
     <>
-      <Input onTextChange={(value) => handleSearchInputChange(value)} />
-      <FilterButtonRow>
-        <MenuButton
-          listData={[...new Set(getLanguageArrayList)]}
-          title={selectedFilterText}
-          onItemClicked={handleFilterPress}
-        />
-        <MenuButton
-          listData={['Ascending', 'Descending']}
-          title={selectedSortText}
-          onItemClicked={handleSortChange}
-        />
-      </FilterButtonRow>
-      {derivedCountriesData && !loading ? (
-        derivedCountriesData.map((country) => {
-          return (
-            <CountryCard
-              key={country.name}
-              name={country.name}
-              capital={country.capital}
-              emoji={country.emoji}
-              currency={country.currency}
-              languages={getLanguages(country.languages)}
+      <Input onTextChange={(value) => setSearchTerm(value)} />
+      {countries && !loading ? (
+        <>
+          <FilterButtonRow>
+            <MenuButton
+              listData={[
+                OptionTypes.FilterAllLanguages,
+                ...new Set(getLanguageArrayList),
+              ]}
+              title={filterTerm}
+              onItemClicked={handleFilter}
             />
-          );
-        })
+            <MenuButton
+              listData={SORT_OPTIONS}
+              title={selectedSort}
+              onItemClicked={handleSort}
+            />
+          </FilterButtonRow>
+          {sortedCountries.map((country) => {
+            return (
+              <CountryCard
+                key={country.name}
+                name={country.name}
+                capital={country.capital}
+                flag={country.flag.svgFile}
+                currency={getCurrencySymbol(country.currencies)}
+                languages={getFormattedLanguages(country.officialLanguages)}
+              />
+            );
+          })}
+        </>
       ) : (
         <LoadingSpinner />
       )}

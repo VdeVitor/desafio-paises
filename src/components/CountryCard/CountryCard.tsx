@@ -9,25 +9,21 @@ import {
   CurrencyIcon,
   Name,
 } from './styles';
-import { Small } from '../Typography/Typography';
+import { Small, Caption } from '../Typography/Typography';
 
-const CountryCard = ({
-  name,
-  capital,
-  emoji,
-  currency,
-  languages,
-}: {
+interface Props {
   name: string;
-  capital: string;
-  emoji: string;
-  currency: number;
+  capital?: string;
+  flag?: string;
+  currency: string[];
   languages: string;
-}) => {
+}
+
+const CountryCard = ({ name, capital, flag, currency, languages }: Props) => {
   return (
     <Card>
       <Row>
-        {emoji && <Flag>{emoji}</Flag>}
+        {flag && <Flag imageSource={flag} />}
         <Content>
           <div>
             {name && <Name>{name}</Name>}
@@ -38,8 +34,8 @@ const CountryCard = ({
             )}
           </div>
           <Details>
-            {capital && <Small>Capital: {capital}</Small>}
-            {languages && <Small>Languages: {languages}</Small>}
+            {capital && <Caption>Capital: {capital}</Caption>}
+            {languages && <Caption>Languages: {languages}</Caption>}
           </Details>
         </Content>
       </Row>

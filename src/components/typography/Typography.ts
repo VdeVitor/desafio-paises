@@ -10,7 +10,7 @@ export const Title = styled.h1`
 `;
 
 export const Caption = styled.p`
-  color: ${symbols.font.colors.primary}
+  color: ${symbols.font.colors.primary};
   font-size: ${symbols.font.size._12};
   font-family: ${symbols.font.family.lato};
   font-weight: ${symbols.font.weight.regular};

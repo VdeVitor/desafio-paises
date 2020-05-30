@@ -4,6 +4,7 @@ export const symbols = {
   borders: {
     radius: {
       _4: '4px',
+      _6: '6px',
       _50: '50px',
     },
     shadows: {
@@ -55,8 +56,8 @@ export const symbols = {
     tabletDevice: '768px',
   },
   size: {
-    flagSizeSmall: rem(56),
-    flagSizeLarge: rem(100),
+    flagWidth: rem(140),
+    flagHeight: rem(100),
     inputHeight: rem(50),
     maxMenuHeight: rem(260),
     icon: rem(24),
@@ -70,6 +71,7 @@ export const symbols = {
     _12: rem(12),
     _16: rem(16),
     _20: rem(20),
+    _24: rem(24),
     _26: rem(26),
     _32: rem(32),
     _48: rem(48),
