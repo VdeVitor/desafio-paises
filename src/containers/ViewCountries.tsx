@@ -8,8 +8,8 @@ import { LoadingSpinner } from '../components/Spinner/styles';
 import { FilterButtonRow } from './styles';
 import MenuButton from '../components/MenuButton/MenuButton';
 import { withApollo, WithApolloClient } from 'react-apollo';
-import { ApolloClient } from 'apollo-boost';
 import { formatNumber } from '../utils';
+import moment from 'moment-timezone';
 
 interface Languages {
   name: string;
@@ -25,6 +25,10 @@ interface Currency {
   symbol: string;
 }
 
+interface Timezones {
+  name: string;
+}
+
 export interface Distance {
   distanceInKm: number;
   countryName: string;
@@ -37,7 +41,9 @@ export interface Country {
   currencies: Currency[];
   officialLanguages: Languages[];
   distanceToOtherCountries: Distance[];
+  distanceToGB: number | undefined;
   population: number;
+  timezones: Timezones[];
 }
 
 export interface Countries {
@@ -91,6 +97,9 @@ const COUNTRIES = gql`
       flag {
         svgFile
       }
+      timezones {
+        name
+      }
     }
   }
 `;
@@ -123,11 +132,19 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   }, []);
 
   useEffect(() => {
-    if (data) {
-      const countriesWithDistanceFrom = data.Country.map((country) => {
+    let distanceArray: number | undefined;
+
+    if (data && countriesDistanceFrom) {
+      const countriesWithDistanceFrom = data.Country.map((country, index) => {
+        if (countriesDistanceFrom.length) {
+          distanceArray = mapCountryDistance(
+            country.name,
+            countriesDistanceFrom[0].distanceToOtherCountries
+          );
+        }
         return {
           ...country,
-          ...countriesDistanceFrom[0],
+          distanceToGB: distanceArray,
         };
       });
       setCountries(countriesWithDistanceFrom);
@@ -156,6 +173,16 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
       );
     }
 
+    if (selectedSort === OptionTypes.SortByDistance) {
+      result = result.sort((a, b) =>
+        a.distanceToGB && b.distanceToGB ? a.distanceToGB - b.distanceToGB : 0
+      );
+    }
+
+    if (selectedSort === OptionTypes.SortByPopulation) {
+      result = result.sort((a, b) => b.population - a.population);
+    }
+
     setSortedCountries(result);
   }, [searchTerm, countries, filterTerm, selectedSort]);
 
@@ -179,6 +206,14 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     callback();
     setSelectedSort(sortType);
   }, []);
+
+  const getLocalTime = useCallback(
+    (timezones: Timezones[]) =>
+      timezones.map((zone, index) =>
+        moment(new Date()).zone(zone.name).format('HH:mm')
+      ),
+    []
+  );
 
   const mapCountryDistance = (name: string, distanceArr: Distance[]) => {
     const result = distanceArr.filter((item) => {
@@ -216,13 +251,6 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
             />
           </FilterButtonRow>
           {sortedCountries.map((country) => {
-            const result =
-              country.distanceToOtherCountries &&
-              country.distanceToOtherCountries.length &&
-              mapCountryDistance(
-                country.name,
-                country.distanceToOtherCountries
-              );
             return (
               <CountryCard
                 key={country.name}
@@ -231,8 +259,9 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
                 flag={country.flag.svgFile}
                 currency={getCurrencySymbol(country.currencies)}
                 languages={getFormattedLanguages(country.officialLanguages)}
-                distance={result}
+                distance={country.distanceToGB}
                 population={formatNumber(country.population)}
+                time={getLocalTime(country.timezones)}
               />
             );
           })}

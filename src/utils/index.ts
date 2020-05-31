@@ -17,3 +17,9 @@ export function formatNumber(num: number) {
   }
   return num;
 }
+
+export function convertUTCDateToLocalDate(date: any) {
+  return new Date(
+    Date.UTC(date.getHours(), date.getMinutes(), date.getSeconds())
+  );
+}

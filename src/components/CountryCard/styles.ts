@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Card as MuiCard } from '@material-ui/core';
 import { symbols } from '../../themes/symbols';
-import { Title, SmallBold } from '../Typography/Typography';
+import { Title, SmallBold, Caption } from '../Typography/Typography';
 
 export const Card = styled(MuiCard)`
   display: flex;
@@ -24,30 +24,31 @@ export const Row = styled.div`
   flex-direction: row;
 `;
 
-export const Flag = styled.span<{ imageSource: string }>`
-  background: ${(props) => `url('${props.imageSource}')`};
-  background-size: ${symbols.size.flagWidthSmall} ${symbols.size.flagWidthSmall};
-  background-repeat: no-repeat;
+export const Flag = styled.img<{ imageSource: string }>`
   width: ${symbols.size.flagWidthSmall};
   height: ${symbols.size.flagHeightSmall};
-  border-radius: ${symbols.borders.radius._2};
   margin-right: ${symbols.spacing._24};
+  border-radius: ${symbols.borders.radius._2};
 
   @media (min-width: ${symbols.media.tabletDevice}) {
     width: ${symbols.size.flagWidth};
     height: ${symbols.size.flagHeight};
-    background-size: cover;
     border-radius: ${symbols.borders.radius._6};
   }
 `;
 
-export const Name = styled(Title)`
-  float: left;
+export const DetailsTitleContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
-export const Content = styled.div`
-  display: flex;
-  flex-direction: column;
+export const DetailsTitle = styled(Title)`
+  float: left;
+  margin-right: ${symbols.spacing._8};
+`;
+
+export const Content = styled(Row)`
+  width: 100%;
 `;
 
 export const Details = styled.div`
@@ -79,12 +80,24 @@ export const DetailsMobile = styled.div`
 
 export const CurrencyIcon = styled.span`
   background-color: ${symbols.colors.currency};
+  float: left;
+  min-width: ${symbols.spacing._12};
+  min-height: ${symbols.spacing._14};
+  padding: ${symbols.spacing._2} ${symbols.spacing._4};
+  border-radius: 50%;
+  font-size: ${symbols.font.size._10};
+
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-radius: ${symbols.borders.radius._50};
-  float: left;
-  padding: ${symbols.spacing._6};
-  margin-left: ${symbols.spacing._8};
-  margin-top: ${symbols.spacing._2};
+  align-items: center;
+`;
+export const TimeContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+`;
+
+export const Time = styled(Caption)`
+  color: ${symbols.font.colors.tertiary};
 `;

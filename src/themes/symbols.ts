@@ -73,6 +73,7 @@ export const symbols = {
     _8: rem(8),
     _10: rem(10),
     _12: rem(12),
+    _14: rem(14),
     _16: rem(16),
     _20: rem(20),
     _24: rem(24),

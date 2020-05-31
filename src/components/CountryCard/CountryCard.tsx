@@ -7,15 +7,17 @@ import {
   Row,
   Details,
   CurrencyIcon,
-  Name,
+  DetailsTitle,
   DetailsBottom,
   DetailsBottomInner,
   DetailsBottomText,
+  DetailsTitleContainer,
+  TimeContainer,
+  Time,
 } from './styles';
 import { Small, Caption, SmallBold } from '../Typography/Typography';
 import Icon from '../Icon/Icon';
 import { symbols } from '../../themes/symbols';
-import { Distance } from '../../containers/ViewCountries';
 
 interface Props {
   name: string;
@@ -25,6 +27,7 @@ interface Props {
   languages: string;
   distance: number | null | undefined;
   population: string | number;
+  time: string[];
 }
 
 const CountryCard = ({
@@ -35,28 +38,25 @@ const CountryCard = ({
   languages,
   distance,
   population,
+  time,
 }: Props) => {
   return (
     <Card>
       <Row>
-        {flag && <Flag imageSource={flag} />}
+        {flag && <Flag src={flag} imageSource={flag} />}
         <Content>
-          <div>
-            {name && <Name>{name}</Name>}
-            {currency && (
-              <CurrencyIcon>
-                <Small>{currency}</Small>
-              </CurrencyIcon>
-            )}
-          </div>
           <Details>
+            <DetailsTitleContainer>
+              {name && <DetailsTitle>{name}</DetailsTitle>}
+              {currency && <CurrencyIcon>{currency}</CurrencyIcon>}
+            </DetailsTitleContainer>
             <>
               {capital && <Caption>Capital: {capital}</Caption>}
               {languages && <Caption>Languages: {languages}</Caption>}
             </>
-            <DetailsBottom className="1">
+            <DetailsBottom>
               {population && (
-                <DetailsBottomInner className="2">
+                <DetailsBottomInner>
                   <Icon type="user" size={symbols.size.iconSmall} />
                   <DetailsBottomText>{population}</DetailsBottomText>
                 </DetailsBottomInner>
@@ -69,6 +69,9 @@ const CountryCard = ({
               )}
             </DetailsBottom>
           </Details>
+          <TimeContainer>
+            <Time>{time[0]}</Time>
+          </TimeContainer>
         </Content>
       </Row>
       <DetailsMobile>
