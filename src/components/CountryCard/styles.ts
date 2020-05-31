@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Card as MuiCard } from '@material-ui/core';
 import { symbols } from '../../themes/symbols';
-import { Title } from '../Typography/Typography';
+import { Title, SmallBold } from '../Typography/Typography';
 
 export const Card = styled(MuiCard)`
   display: flex;
@@ -26,12 +26,18 @@ export const Row = styled.div`
 
 export const Flag = styled.span<{ imageSource: string }>`
   background: ${(props) => `url('${props.imageSource}')`};
-  background-size: cover;
-  width: ${symbols.size.flagWidth};
-  height: ${symbols.size.flagHeight};
-  border-radius: ${symbols.borders.radius._6};
+  background-size: ${symbols.size.flagWidthSmall} ${symbols.size.flagWidthSmall};
+  background-repeat: no-repeat;
+  width: ${symbols.size.flagWidthSmall};
+  height: ${symbols.size.flagHeightSmall};
+  border-radius: ${symbols.borders.radius._2};
   margin-right: ${symbols.spacing._24};
+
   @media (min-width: ${symbols.media.tabletDevice}) {
+    width: ${symbols.size.flagWidth};
+    height: ${symbols.size.flagHeight};
+    background-size: cover;
+    border-radius: ${symbols.borders.radius._6};
   }
 `;
 
@@ -50,6 +56,18 @@ export const Details = styled.div`
   @media (min-width: ${symbols.media.tabletDevice}) {
     display: block;
   }
+`;
+
+export const DetailsBottom = styled(Row)`
+  margin-top: ${symbols.spacing._16};
+`;
+
+export const DetailsBottomInner = styled(Row)`
+  margin-right: ${symbols.spacing._16};
+`;
+
+export const DetailsBottomText = styled(SmallBold)`
+  padding-left: ${symbols.spacing._4};
 `;
 
 export const DetailsMobile = styled.div`

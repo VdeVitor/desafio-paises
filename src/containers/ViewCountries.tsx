@@ -7,6 +7,9 @@ import Input from '../components/Input/Input';
 import { LoadingSpinner } from '../components/Spinner/styles';
 import { FilterButtonRow } from './styles';
 import MenuButton from '../components/MenuButton/MenuButton';
+import { withApollo, WithApolloClient } from 'react-apollo';
+import { ApolloClient } from 'apollo-boost';
+import { formatNumber } from '../utils';
 
 interface Languages {
   name: string;
@@ -22,12 +25,19 @@ interface Currency {
   symbol: string;
 }
 
+export interface Distance {
+  distanceInKm: number;
+  countryName: string;
+}
+
 export interface Country {
   name: string;
   capital: string;
   flag: Flag;
   currencies: Currency[];
   officialLanguages: Languages[];
+  distanceToOtherCountries: Distance[];
+  population: number;
 }
 
 export interface Countries {
@@ -47,6 +57,17 @@ const SORT_OPTIONS = [
   'Sort by population (highest)',
 ];
 
+const COUNTRY_DISTANCE = gql`
+  {
+    Country(alpha2Code: "GB") {
+      distanceToOtherCountries {
+        distanceInKm
+        countryName
+      }
+    }
+  }
+`;
+
 const COUNTRIES = gql`
   {
     Country {
@@ -54,11 +75,6 @@ const COUNTRIES = gql`
       population
       populationDensity
       capital
-      location {
-        latitude
-        longitude
-      }
-      numericCode
       subregion {
         name
         region {
@@ -66,10 +82,7 @@ const COUNTRIES = gql`
         }
       }
       officialLanguages {
-        iso639_1
-        iso639_2
         name
-        nativeName
       }
       currencies {
         name
@@ -82,9 +95,12 @@ const COUNTRIES = gql`
   }
 `;
 
-const ViewCountries = () => {
+const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   const { loading, error, data } = useQuery<Countries>(COUNTRIES);
   const [countries, setCountries] = useState<Country[]>([]);
+  const [countriesDistanceFrom, setCountriesDistanceFrom] = useState<Country[]>(
+    []
+  );
   const [sortedCountries, setSortedCountries] = useState<Country[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTerm, setFilterTerm] = useState('');
@@ -96,10 +112,27 @@ const ViewCountries = () => {
   }, []);
 
   useEffect(() => {
+    const queryDistanceFromCountry = async () =>
+      await client
+        .query({
+          query: COUNTRY_DISTANCE,
+        })
+        .then((res) => setCountriesDistanceFrom(res.data.Country));
+
+    queryDistanceFromCountry();
+  }, []);
+
+  useEffect(() => {
     if (data) {
-      setCountries(data.Country);
+      const countriesWithDistanceFrom = data.Country.map((country) => {
+        return {
+          ...country,
+          ...countriesDistanceFrom[0],
+        };
+      });
+      setCountries(countriesWithDistanceFrom);
     }
-  }, [data]);
+  }, [data, countriesDistanceFrom]);
 
   useEffect(() => {
     let result = [...countries];
@@ -147,6 +180,16 @@ const ViewCountries = () => {
     setSelectedSort(sortType);
   }, []);
 
+  const mapCountryDistance = (name: string, distanceArr: Distance[]) => {
+    const result = distanceArr.filter((item) => {
+      return item.countryName.includes(name);
+    });
+
+    if (result.length) {
+      return Math.floor(result[0].distanceInKm);
+    }
+  };
+
   const getLanguageArrayList = data?.Country.reduce<string[]>(
     (a, b) => [...a, ...b.officialLanguages.map(({ name }) => name)],
     []
@@ -173,6 +216,13 @@ const ViewCountries = () => {
             />
           </FilterButtonRow>
           {sortedCountries.map((country) => {
+            const result =
+              country.distanceToOtherCountries &&
+              country.distanceToOtherCountries.length &&
+              mapCountryDistance(
+                country.name,
+                country.distanceToOtherCountries
+              );
             return (
               <CountryCard
                 key={country.name}
@@ -181,6 +231,8 @@ const ViewCountries = () => {
                 flag={country.flag.svgFile}
                 currency={getCurrencySymbol(country.currencies)}
                 languages={getFormattedLanguages(country.officialLanguages)}
+                distance={result}
+                population={formatNumber(country.population)}
               />
             );
           })}
@@ -192,4 +244,4 @@ const ViewCountries = () => {
   );
 };
 
-export default ViewCountries;
+export default withApollo(ViewCountries);

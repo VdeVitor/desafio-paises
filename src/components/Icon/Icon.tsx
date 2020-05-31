@@ -1,7 +1,7 @@
 import React from 'react';
 import { IconElement } from './styles';
 
-type IconTypes = 'search' | 'check';
+type IconTypes = 'search' | 'check' | 'plane' | 'user';
 
 interface Position {
   top?: number;
@@ -12,17 +12,22 @@ interface Position {
 
 export interface IconProps {
   size: string;
-  absolute: boolean;
-  position: Position;
+  absolute?: boolean;
+  position?: Position;
 }
 
 interface Props extends IconProps {
   type: IconTypes;
 }
 
-const Icon = ({ type, size, position }: Props) => {
+const Icon = ({ type, size, position, absolute }: Props) => {
   return (
-    <IconElement className={type} size={size} absolute position={position} />
+    <IconElement
+      className={type}
+      size={size}
+      absolute={absolute}
+      position={position}
+    />
   );
 };
 

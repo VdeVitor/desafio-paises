@@ -3,6 +3,7 @@ import { rem } from '../utils';
 export const symbols = {
   borders: {
     radius: {
+      _2: '2px',
       _4: '4px',
       _6: '6px',
       _50: '50px',
@@ -58,8 +59,11 @@ export const symbols = {
   size: {
     flagWidth: rem(140),
     flagHeight: rem(100),
+    flagWidthSmall: rem(56),
+    flagHeightSmall: rem(50),
     inputHeight: rem(50),
     maxMenuHeight: rem(260),
+    iconSmall: rem(12),
     icon: rem(24),
   },
   spacing: {
