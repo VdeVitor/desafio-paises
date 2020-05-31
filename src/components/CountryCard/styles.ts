@@ -51,7 +51,9 @@ export const Content = styled(Row)`
   width: 100%;
 `;
 
-export const Details = styled.div`
+export const Details = styled.div``;
+
+export const DetailsTop = styled.div`
   display: none;
 
   @media (min-width: ${symbols.media.tabletDevice}) {
@@ -61,6 +63,13 @@ export const Details = styled.div`
 
 export const DetailsBottom = styled(Row)`
   margin-top: ${symbols.spacing._16};
+  display: none;
+
+  @media (min-width: ${symbols.media.tabletDevice}) {
+    display: block;
+    display: flex;
+    flex-direction: row;
+  }
 `;
 
 export const DetailsBottomInner = styled(Row)`
@@ -71,11 +80,15 @@ export const DetailsBottomText = styled(SmallBold)`
   padding-left: ${symbols.spacing._4};
 `;
 
-export const DetailsMobile = styled.div`
-  margin-left: ${symbols.spacing._4};
+export const MediaDetails = styled.div`
+  margin-top: ${symbols.spacing._20};
   @media (min-width: ${symbols.media.tabletDevice}) {
     display: none;
   }
+`;
+
+export const MediaDetailsBottom = styled(Row)`
+  margin-top: ${symbols.spacing._16};
 `;
 
 export const CurrencyIcon = styled.span`
@@ -93,11 +106,22 @@ export const CurrencyIcon = styled.span`
   align-items: center;
 `;
 export const TimeContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  flex: 1;
+  display: none;
+
+  @media (min-width: ${symbols.media.tabletDevice}) {
+    display: block;
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+  }
 `;
 
 export const Time = styled(Caption)`
   color: ${symbols.font.colors.tertiary};
+`;
+
+export const MediaTime = styled(Time)`
+  @media (min-width: ${symbols.media.tabletDevice}) {
+    display: none;
+  }
 `;

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 
@@ -50,7 +50,7 @@ export interface Countries {
   Country: Country[];
 }
 
-enum OptionTypes {
+export enum OptionTypes {
   SortByAlphabet = 'Sort A-Z',
   SortByDistance = 'Sort by distance (closest)',
   SortByPopulation = 'Sort by population (highest)',
@@ -105,7 +105,7 @@ const COUNTRIES = gql`
 `;
 
 const ViewCountries = ({ client }: WithApolloClient<{}>) => {
-  const { loading, error, data } = useQuery<Countries>(COUNTRIES);
+  const { error, data } = useQuery<Countries>(COUNTRIES);
   const [countries, setCountries] = useState<Country[]>([]);
   const [countriesDistanceFrom, setCountriesDistanceFrom] = useState<Country[]>(
     []
@@ -114,6 +114,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTerm, setFilterTerm] = useState('');
   const [selectedSort, setSelectedSort] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setFilterTerm(OptionTypes.FilterAllLanguages);
@@ -153,6 +154,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
 
   useEffect(() => {
     let result = [...countries];
+    setLoading(true);
 
     if (searchTerm) {
       result = result.filter(
@@ -184,7 +186,8 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     }
 
     setSortedCountries(result);
-  }, [searchTerm, countries, filterTerm, selectedSort]);
+    setLoading(false);
+  }, [searchTerm, countries, filterTerm, selectedSort, loading]);
 
   const getFormattedLanguages = useCallback(
     (languages: Languages[]) =>
@@ -225,15 +228,19 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     }
   };
 
-  const getLanguageArrayList = data?.Country.reduce<string[]>(
-    (a, b) => [...a, ...b.officialLanguages.map(({ name }) => name)],
-    []
+  const getLanguageArrayList = useMemo(
+    () =>
+      data?.Country.reduce<string[]>(
+        (a, b) => [...a, ...b.officialLanguages.map(({ name }) => name)],
+        []
+      ).sort((a, b) => (a !== b ? (a < b ? -1 : 1) : 0)),
+    [data]
   );
 
   return (
     <>
       <Input onTextChange={(value) => setSearchTerm(value)} />
-      {countries && !loading ? (
+      {sortedCountries && !loading ? (
         <>
           <FilterButtonRow>
             <MenuButton
@@ -243,6 +250,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
               ]}
               title={filterTerm}
               onItemClicked={handleFilter}
+              removeFilter={() => setFilterTerm(OptionTypes.FilterAllLanguages)}
             />
             <MenuButton
               listData={SORT_OPTIONS}

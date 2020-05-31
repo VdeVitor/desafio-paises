@@ -3,7 +3,6 @@ import {
   Card,
   Flag,
   Content,
-  DetailsMobile,
   Row,
   Details,
   CurrencyIcon,
@@ -14,6 +13,10 @@ import {
   DetailsTitleContainer,
   TimeContainer,
   Time,
+  MediaDetails,
+  MediaDetailsBottom,
+  DetailsTop,
+  MediaTime,
 } from './styles';
 import { Small, Caption, SmallBold } from '../Typography/Typography';
 import Icon from '../Icon/Icon';
@@ -50,10 +53,11 @@ const CountryCard = ({
               {name && <DetailsTitle>{name}</DetailsTitle>}
               {currency && <CurrencyIcon>{currency}</CurrencyIcon>}
             </DetailsTitleContainer>
-            <>
+            <MediaTime>{time}</MediaTime>
+            <DetailsTop>
               {capital && <Caption>Capital: {capital}</Caption>}
               {languages && <Caption>Languages: {languages}</Caption>}
-            </>
+            </DetailsTop>
             <DetailsBottom>
               {population && (
                 <DetailsBottomInner>
@@ -74,10 +78,26 @@ const CountryCard = ({
           </TimeContainer>
         </Content>
       </Row>
-      <DetailsMobile>
-        {capital && <Small>Capital: {capital}</Small>}
-        {languages && <Small>Languages: {languages}</Small>}
-      </DetailsMobile>
+      <MediaDetails>
+        <>
+          {capital && <Small>Capital: {capital}</Small>}
+          {languages && <Small>Languages: {languages}</Small>}
+          <MediaDetailsBottom>
+            {population && (
+              <DetailsBottomInner>
+                <Icon type="user" size={symbols.size.iconSmall} />
+                <DetailsBottomText>{population}</DetailsBottomText>
+              </DetailsBottomInner>
+            )}
+            {distance && (
+              <DetailsBottomInner>
+                <Icon type="plane" size={symbols.size.iconSmall} />
+                <DetailsBottomText>{distance}km</DetailsBottomText>
+              </DetailsBottomInner>
+            )}
+          </MediaDetailsBottom>
+        </>
+      </MediaDetails>
     </Card>
   );
 };

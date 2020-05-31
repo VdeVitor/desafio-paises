@@ -1,7 +1,7 @@
 import React from 'react';
 import { IconElement } from './styles';
 
-type IconTypes = 'search' | 'check' | 'plane' | 'user';
+type IconTypes = 'search' | 'check' | 'plane' | 'user' | 'close';
 
 interface Position {
   top?: number;

@@ -24,6 +24,7 @@ export const symbols = {
     black: 'rgba(0, 0, 0, 1)',
     black01: 'rgba(0, 0, 0, 0.1)',
     white: 'rgba(255, 255, 255, 1)',
+    white05: 'rgba(255, 255, 255, 0.5)',
   },
   font: {
     colors: {
@@ -43,6 +44,7 @@ export const symbols = {
     size: {
       _10: rem(10),
       _12: rem(12),
+      _14: rem(14),
       _16: rem(16),
       _20: rem(20),
     },
@@ -75,10 +77,12 @@ export const symbols = {
     _12: rem(12),
     _14: rem(14),
     _16: rem(16),
+    _18: rem(18),
     _20: rem(20),
     _24: rem(24),
     _26: rem(26),
     _32: rem(32),
+    _34: rem(34),
     _48: rem(48),
     _52: rem(52),
   },

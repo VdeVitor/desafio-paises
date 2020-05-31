@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import search from '../../assets/icons/search.svg';
 import plane from '../../assets/icons/plane.svg';
 import user from '../../assets/icons/user.svg';
+import close from '../../assets/icons/close.svg';
+import check from '../../assets/icons/check.svg';
 import { IconProps } from './Icon';
 
 export const IconElement = styled.i<IconProps>`
@@ -19,6 +21,11 @@ export const IconElement = styled.i<IconProps>`
     display: block;
   }
 
+  &.check::before {
+    background-image: url('${check}');
+  }
+
+
   &.search::before {
     background-image: url('${search}');
   }
@@ -29,5 +36,9 @@ export const IconElement = styled.i<IconProps>`
 
   &.user:before {
     background-image: url('${user}');
+  }
+
+  &.close:before {
+    background-image: url('${close}');
   }
 `;
