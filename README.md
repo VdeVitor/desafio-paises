@@ -20,3 +20,8 @@ To install this app please follow the below installation steps:
 4. To launch the app locally use the command `yarn start`. This will launch the application on `http://localhost:3000`. Head over to your browser to see the app in action. Enjoy!
 
 5. Bonus - Filters and sorts have been added. You can filter by language, sort alphabetically, sort by distance (closest) and sort by population (highest).
+
+## Future Improvements
+
+- Debounce search input
+- Lazy load image urls
