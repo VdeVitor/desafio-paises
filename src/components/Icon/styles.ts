@@ -4,7 +4,9 @@ import plane from '../../assets/icons/plane.svg';
 import user from '../../assets/icons/user.svg';
 import close from '../../assets/icons/close.svg';
 import check from '../../assets/icons/check.svg';
+import closeInput from '../../assets/icons/close-input.svg';
 import { IconProps } from './Icon';
+import { symbols } from '../../themes/symbols';
 
 export const IconElement = styled.i<IconProps>`
   &::before {
@@ -40,5 +42,14 @@ export const IconElement = styled.i<IconProps>`
 
   &.close:before {
     background-image: url('${close}');
+  }
+
+  &.close-input:before {
+    background-image: url('${closeInput}');
+    cursor: pointer;
+
+    @media(min-width: ${symbols.media.tabletDevice}) {
+      display: none;
+    }
   }
 `;

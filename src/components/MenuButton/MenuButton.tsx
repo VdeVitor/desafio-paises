@@ -19,7 +19,6 @@ const MenuButton = ({
   removeFilter,
 }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [buttonSelected, setButtonSelected] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleClick = useCallback(
@@ -35,7 +34,7 @@ const MenuButton = ({
 
   const active = useMemo(
     () => !Object.values(OptionTypes).includes(title as OptionTypes),
-    [title, OptionTypes]
+    [title]
   );
 
   return (
@@ -43,7 +42,7 @@ const MenuButton = ({
       <Button
         onClick={handleClick}
         marginStyle={{ marginRight: symbols.spacing._12 }}
-        active={active}
+        active={active ? 1 : 0}
         filterButton
         removeFilter={removeFilter}
       >
@@ -56,23 +55,20 @@ const MenuButton = ({
         PaperProps={{
           style: {
             maxHeight: symbols.size.maxMenuHeight,
-            transform: `translateY(${symbols.spacing._34})`,
+            transform: `translateY(${symbols.spacing._14})`,
           },
         }}
       >
         {listData.map((item: any) => (
-          <>
-            <MenuItem
-              key={item}
-              onClick={() => onItemClicked(item, handleClose)}
-            >
+          <div key={item}>
+            <MenuItem onClick={() => onItemClicked(item, handleClose)}>
               {item}
               {active && item === title && (
                 <Icon type="check" size={symbols.size.iconSmall} />
               )}
             </MenuItem>
             <MenuItemSeparator />
-          </>
+          </div>
         ))}
       </Menu>
     </>

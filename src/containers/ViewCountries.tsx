@@ -4,12 +4,13 @@ import { useQuery } from '@apollo/react-hooks';
 
 import CountryCard from '../components/CountryCard/CountryCard';
 import Input from '../components/Input/Input';
-import { LoadingSpinner } from '../components/Spinner/styles';
-import { FilterButtonRow } from './styles';
+import { FilterButtonRow, ContentLoaderContainer } from './styles';
 import MenuButton from '../components/MenuButton/MenuButton';
 import { withApollo, WithApolloClient } from 'react-apollo';
 import { formatNumber } from '../utils';
 import moment from 'moment-timezone';
+import ContentLoader from '../components/ContentLoader/ContentLoader';
+import { Caption } from '../components/Typography/Typography';
 
 interface Languages {
   name: string;
@@ -105,7 +106,9 @@ const COUNTRIES = gql`
 `;
 
 const ViewCountries = ({ client }: WithApolloClient<{}>) => {
-  const { error, data } = useQuery<Countries>(COUNTRIES);
+  const { loading: initiallyLoading, error, data } = useQuery<Countries>(
+    COUNTRIES
+  );
   const [countries, setCountries] = useState<Country[]>([]);
   const [countriesDistanceFrom, setCountriesDistanceFrom] = useState<Country[]>(
     []
@@ -130,7 +133,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
         .then((res) => setCountriesDistanceFrom(res.data.Country));
 
     queryDistanceFromCountry();
-  }, []);
+  }, [client]);
 
   useEffect(() => {
     let distanceArray: number | undefined;
@@ -150,11 +153,11 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
       });
       setCountries(countriesWithDistanceFrom);
     }
+    // eslint-disable-next-line
   }, [data, countriesDistanceFrom]);
 
   useEffect(() => {
     let result = [...countries];
-    setLoading(true);
 
     if (searchTerm) {
       result = result.filter(
@@ -186,8 +189,13 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     }
 
     setSortedCountries(result);
-    setLoading(false);
-  }, [searchTerm, countries, filterTerm, selectedSort, loading]);
+
+    if (!initiallyLoading) {
+      setLoading(false);
+    }
+
+    // eslint-disable-next-line
+  }, [searchTerm, countries, filterTerm, selectedSort]);
 
   const getFormattedLanguages = useCallback(
     (languages: Languages[]) =>
@@ -218,15 +226,18 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     []
   );
 
-  const mapCountryDistance = (name: string, distanceArr: Distance[]) => {
-    const result = distanceArr.filter((item) => {
-      return item.countryName.includes(name);
-    });
+  const mapCountryDistance = useCallback(
+    (name: string, distanceArr: Distance[]) => {
+      const result = distanceArr.filter((item) => {
+        return item.countryName.includes(name);
+      });
 
-    if (result.length) {
-      return Math.floor(result[0].distanceInKm);
-    }
-  };
+      if (result.length) {
+        return Math.floor(result[0].distanceInKm);
+      }
+    },
+    []
+  );
 
   const getLanguageArrayList = useMemo(
     () =>
@@ -239,8 +250,21 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
 
   return (
     <>
-      <Input onTextChange={(value) => setSearchTerm(value)} />
-      {sortedCountries && !loading ? (
+      <Input
+        text={searchTerm}
+        onTextChange={(value) => setSearchTerm(value)}
+        clearSearch={() => setSearchTerm('')}
+      />
+      {loading && (
+        <>
+          <ContentLoaderContainer>
+            {[...Array(10)].map((_, index) => (
+              <ContentLoader key={index} />
+            ))}
+          </ContentLoaderContainer>
+        </>
+      )}
+      {!loading && (
         <>
           <FilterButtonRow>
             <MenuButton
@@ -274,9 +298,12 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
             );
           })}
         </>
-      ) : (
-        <LoadingSpinner />
       )}
+      {!loading && !sortedCountries.length && (
+        <Caption>Oops! No Results Found</Caption>
+      )}
+
+      {error && <Caption>Oops! Something went wrong. Try back later</Caption>}
     </>
   );
 };

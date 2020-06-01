@@ -3,7 +3,7 @@ import { Button as MuiButton } from '@material-ui/core';
 import { symbols } from '../../themes/symbols';
 import { Small } from '../Typography/Typography';
 
-export const StyledButton = styled(MuiButton)<{ active: boolean }>`
+export const StyledButton = styled(MuiButton)<{ active: number }>`
   background-color: ${(props) =>
     props.active ? symbols.colors.accent2 : symbols.colors.neutral};
   text-transform: none;
@@ -21,7 +21,7 @@ export const StyledButton = styled(MuiButton)<{ active: boolean }>`
   }
 `;
 
-export const ButtonText = styled(Small)<{ active: boolean }>`
+export const ButtonText = styled(Small)<{ active: number }>`
   color: ${(props) =>
     props.active ? symbols.colors.white : symbols.font.colors.secondary};
   margin-right: ${(props) => (props.active ? symbols.spacing._12 : null)};

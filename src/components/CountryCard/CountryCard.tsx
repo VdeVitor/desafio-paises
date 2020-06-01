@@ -18,7 +18,7 @@ import {
   DetailsTop,
   MediaTime,
 } from './styles';
-import { Small, Caption, SmallBold } from '../Typography/Typography';
+import { Small, Caption } from '../Typography/Typography';
 import Icon from '../Icon/Icon';
 import { symbols } from '../../themes/symbols';
 
@@ -53,7 +53,7 @@ const CountryCard = ({
               {name && <DetailsTitle>{name}</DetailsTitle>}
               {currency && <CurrencyIcon>{currency}</CurrencyIcon>}
             </DetailsTitleContainer>
-            <MediaTime>{time}</MediaTime>
+            <MediaTime>{time[0]}</MediaTime>
             <DetailsTop>
               {capital && <Caption>Capital: {capital}</Caption>}
               {languages && <Caption>Languages: {languages}</Caption>}

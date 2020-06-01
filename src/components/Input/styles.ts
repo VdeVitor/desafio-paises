@@ -1,6 +1,7 @@
 import { Input as MuiInput } from '@material-ui/core';
 import styled from 'styled-components';
 import { symbols } from '../../themes/symbols';
+import Icon from '../Icon/Icon';
 
 export const InputContainer = styled.div`
   margin: ${symbols.spacing._32} 0 ${symbols.spacing._12};
@@ -17,4 +18,10 @@ export const InputField = styled(MuiInput)`
   font-size: ${symbols.font.size._16};
   font-family: ${symbols.font.family.lato};
   line-height: ${symbols.font.lineHeight._24};
+`;
+
+export const MediaIcon = styled(Icon)`
+  @media (min-width: ${symbols.media.tabletDevice}) {
+    display: none;
+  }
 `;
