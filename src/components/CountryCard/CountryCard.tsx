@@ -31,6 +31,7 @@ interface Props {
   distance: number | null | undefined;
   population: string | number;
   time: string[];
+  onClick: () => void;
 }
 
 const CountryCard = ({
@@ -42,9 +43,10 @@ const CountryCard = ({
   distance,
   population,
   time,
+  onClick,
 }: Props) => {
   return (
-    <Card>
+    <Card onClick={onClick}>
       <Row>
         {flag && <Flag src={flag} imageSource={flag} />}
         <Content>

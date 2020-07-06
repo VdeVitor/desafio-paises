@@ -11,6 +11,7 @@ import { formatNumber } from '../utils';
 import moment from 'moment-timezone';
 import ContentLoader from '../components/ContentLoader/ContentLoader';
 import { Caption } from '../components/Typography/Typography';
+import ViewCountryTimeZones from './ViewCountryTimezones';
 
 interface Languages {
   name: string;
@@ -36,6 +37,7 @@ export interface Distance {
 }
 
 export interface Country {
+  _id: number;
   name: string;
   capital: string;
   flag: Flag;
@@ -78,6 +80,7 @@ const COUNTRY_DISTANCE = gql`
 const COUNTRIES = gql`
   {
     Country {
+      _id
       name
       population
       populationDensity
@@ -118,6 +121,8 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   const [filterTerm, setFilterTerm] = useState('');
   const [selectedSort, setSelectedSort] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showDrawer, setDrawer] = useState(false);
+  const [countryId, setCountryId] = useState<number | null>(null);
 
   useEffect(() => {
     setFilterTerm(OptionTypes.FilterAllLanguages);
@@ -196,6 +201,12 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
 
     // eslint-disable-next-line
   }, [searchTerm, countries, filterTerm, selectedSort]);
+
+  useEffect(() => {
+    if (countryId) {
+      setDrawer(true);
+    }
+  }, [countryId]);
 
   const getFormattedLanguages = useCallback(
     (languages: Languages[]) =>
@@ -285,6 +296,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
           {sortedCountries.map((country) => {
             return (
               <CountryCard
+                onClick={() => setCountryId(country._id)}
                 key={country.name}
                 name={country.name}
                 capital={country.capital}
@@ -304,6 +316,16 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
       )}
 
       {error && <Caption>Oops! Something went wrong. Try back later</Caption>}
+      {countryId ? (
+        <ViewCountryTimeZones
+          open={showDrawer}
+          onClose={() => {
+            setDrawer(false);
+            setCountryId(null);
+          }}
+          id={countryId}
+        />
+      ) : null}
     </>
   );
 };
