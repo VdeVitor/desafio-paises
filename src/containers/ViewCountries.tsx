@@ -1,39 +1,25 @@
-import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useState, useEffect, } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-
 import CountryCard from '../components/CountryCard/CountryCard';
-import Input from '../components/Input/Input';
-import { FilterButtonRow, ContentLoaderContainer } from './styles';
+import { FilterButtonRow } from './styles';
 import MenuButton from '../components/MenuButton/MenuButton';
 import { withApollo, WithApolloClient } from 'react-apollo';
 import { formatNumber } from '../utils';
-import moment from 'moment-timezone';
-import ContentLoader from '../components/ContentLoader/ContentLoader';
 import { Caption } from '../components/Typography/Typography';
-import ViewCountryTimeZones from './ViewCountryTimezones';
 
-interface Languages {
-  name: string;
-  code: string;
-}
 
 interface Flag {
   svgFile: string;
 }
 
-interface Currency {
-  name: string;
-  symbol: string;
-}
-
-interface Timezones {
+interface Region {
   name: string;
 }
 
-export interface Distance {
-  distanceInKm: number;
-  countryName: string;
+interface Subregion {
+  name: string;
+  region: Region;
 }
 
 export interface Country {
@@ -41,12 +27,8 @@ export interface Country {
   name: string;
   capital: string;
   flag: Flag;
-  currencies: Currency[];
-  officialLanguages: Languages[];
-  distanceToOtherCountries: Distance[];
-  distanceToGB: number | undefined;
   population: number;
-  timezones: Timezones[];
+  subregion: Subregion;
 }
 
 export interface Countries {
@@ -54,28 +36,14 @@ export interface Countries {
 }
 
 export enum OptionTypes {
-  SortByAlphabet = 'Sort A-Z',
-  SortByDistance = 'Sort by distance (closest)',
-  SortByPopulation = 'Sort by population (highest)',
-  FilterAllLanguages = 'All languages',
+  FiltrarAlfabetico = 'Filtrar A-Z',
+  FiltrarPopulacao = 'Filtrar por População (Maior)',
 }
 
 const SORT_OPTIONS = [
-  'Sort A-Z',
-  'Sort by distance (closest)',
-  'Sort by population (highest)',
+  'Filtrar A-Z',
+  'Filtrar por População (Maior)',
 ];
-
-const COUNTRY_DISTANCE = gql`
-  {
-    Country(alpha2Code: "GB") {
-      distanceToOtherCountries {
-        distanceInKm
-        countryName
-      }
-    }
-  }
-`;
 
 const COUNTRIES = gql`
   {
@@ -91,18 +59,8 @@ const COUNTRIES = gql`
           name
         }
       }
-      officialLanguages {
-        name
-      }
-      currencies {
-        name
-        symbol
-      }
       flag {
         svgFile
-      }
-      timezones {
-        name
       }
     }
   }
@@ -117,43 +75,22 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     []
   );
   const [sortedCountries, setSortedCountries] = useState<Country[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [filterTerm, setFilterTerm] = useState('');
   const [selectedSort, setSelectedSort] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showDrawer, setDrawer] = useState(false);
-  const [countryId, setCountryId] = useState<number | null>(null);
 
   useEffect(() => {
-    setFilterTerm(OptionTypes.FilterAllLanguages);
-    setSelectedSort(OptionTypes.SortByAlphabet);
+    setSelectedSort(OptionTypes.FiltrarAlfabetico);
   }, []);
 
-  useEffect(() => {
-    const queryDistanceFromCountry = async () =>
-      await client
-        .query({
-          query: COUNTRY_DISTANCE,
-        })
-        .then((res) => setCountriesDistanceFrom(res.data.Country));
-
-    queryDistanceFromCountry();
-  }, [client]);
 
   useEffect(() => {
     let distanceArray: number | undefined;
 
     if (data && countriesDistanceFrom) {
       const countriesWithDistanceFrom = data.Country.map((country, index) => {
-        if (countriesDistanceFrom.length) {
-          distanceArray = mapCountryDistance(
-            country.name,
-            countriesDistanceFrom[0].distanceToOtherCountries
-          );
-        }
         return {
-          ...country,
-          distanceToGB: distanceArray,
+          ...country
         };
       });
       setCountries(countriesWithDistanceFrom);
@@ -164,32 +101,13 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   useEffect(() => {
     let result = [...countries];
 
-    if (searchTerm) {
-      result = result.filter(
-        (country) =>
-          country.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
-      );
-    }
-
-    if (filterTerm && filterTerm !== OptionTypes.FilterAllLanguages) {
-      result = result.filter((country) =>
-        country.officialLanguages.some((g) => filterTerm.includes(g.name))
-      );
-    }
-
-    if (selectedSort === OptionTypes.SortByAlphabet) {
+    if (selectedSort === OptionTypes.FiltrarAlfabetico) {
       result = result.sort((a, b) =>
         a.name !== b.name ? (a.name < b.name ? -1 : 1) : 0
       );
     }
 
-    if (selectedSort === OptionTypes.SortByDistance) {
-      result = result.sort((a, b) =>
-        a.distanceToGB && b.distanceToGB ? a.distanceToGB - b.distanceToGB : 0
-      );
-    }
-
-    if (selectedSort === OptionTypes.SortByPopulation) {
+    if (selectedSort === OptionTypes.FiltrarPopulacao) {
       result = result.sort((a, b) => b.population - a.population);
     }
 
@@ -200,93 +118,20 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
     }
 
     // eslint-disable-next-line
-  }, [searchTerm, countries, filterTerm, selectedSort]);
-
-  useEffect(() => {
-    if (countryId) {
-      setDrawer(true);
-    }
-  }, [countryId]);
-
-  const getFormattedLanguages = useCallback(
-    (languages: Languages[]) =>
-      languages.map((language) => language.name).join(', '),
-    []
-  );
-
-  const getCurrencySymbol = useCallback(
-    (currencies: Currency[]) => currencies.map((currency) => currency.symbol),
-    []
-  );
-
-  const handleFilter = useCallback((filterTerm, callback) => {
-    callback();
-    setFilterTerm(filterTerm);
-  }, []);
+  }, [countries, filterTerm, selectedSort]);
 
   const handleSort = useCallback((sortType, callback) => {
     callback();
     setSelectedSort(sortType);
   }, []);
 
-  const getLocalTime = useCallback(
-    (timezones: Timezones[]) =>
-      timezones.map((zone, index) =>
-        moment(new Date()).zone(zone.name).format('HH:mm')
-      ),
-    []
-  );
-
-  const mapCountryDistance = useCallback(
-    (name: string, distanceArr: Distance[]) => {
-      const result = distanceArr.filter((item) => {
-        return item.countryName.includes(name);
-      });
-
-      if (result.length) {
-        return Math.floor(result[0].distanceInKm);
-      }
-    },
-    []
-  );
-
-  const getLanguageArrayList = useMemo(
-    () =>
-      data?.Country.reduce<string[]>(
-        (a, b) => [...a, ...b.officialLanguages.map(({ name }) => name)],
-        []
-      ).sort((a, b) => (a !== b ? (a < b ? -1 : 1) : 0)),
-    [data]
-  );
 
   return (
     <>
-      <Input
-        text={searchTerm}
-        onTextChange={(value) => setSearchTerm(value)}
-        clearSearch={() => setSearchTerm('')}
-      />
-      {loading && (
-        <>
-          <ContentLoaderContainer>
-            {[...Array(10)].map((_, index) => (
-              <ContentLoader key={index} />
-            ))}
-          </ContentLoaderContainer>
-        </>
-      )}
       {!loading && (
         <>
           <FilterButtonRow>
-            <MenuButton
-              listData={[
-                OptionTypes.FilterAllLanguages,
-                ...new Set(getLanguageArrayList),
-              ]}
-              title={filterTerm}
-              onItemClicked={handleFilter}
-              removeFilter={() => setFilterTerm(OptionTypes.FilterAllLanguages)}
-            />
+            <h4>Filtro: </h4>
             <MenuButton
               listData={SORT_OPTIONS}
               title={selectedSort}
@@ -296,16 +141,12 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
           {sortedCountries.map((country) => {
             return (
               <CountryCard
-                onClick={() => setCountryId(country._id)}
                 key={country.name}
                 name={country.name}
                 capital={country.capital}
                 flag={country.flag.svgFile}
-                currency={getCurrencySymbol(country.currencies)}
-                languages={getFormattedLanguages(country.officialLanguages)}
-                distance={country.distanceToGB}
+                subregion={country.subregion.name}
                 population={formatNumber(country.population)}
-                time={getLocalTime(country.timezones)}
               />
             );
           })}
@@ -316,16 +157,6 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
       )}
 
       {error && <Caption>Oops! Something went wrong. Try back later</Caption>}
-      {countryId ? (
-        <ViewCountryTimeZones
-          open={showDrawer}
-          onClose={() => {
-            setDrawer(false);
-            setCountryId(null);
-          }}
-          id={countryId}
-        />
-      ) : null}
     </>
   );
 };

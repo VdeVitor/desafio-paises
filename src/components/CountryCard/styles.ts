@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Card as MuiCard } from '@material-ui/core';
 import { symbols } from '../../themes/symbols';
-import { Title, SmallBold, Caption } from '../Typography/Typography';
+import { Title, SmallBold } from '../Typography/Typography';
 
 export const Card = styled(MuiCard)`
   display: flex;
@@ -89,39 +89,4 @@ export const MediaDetails = styled.div`
 
 export const MediaDetailsBottom = styled(Row)`
   margin-top: ${symbols.spacing._16};
-`;
-
-export const CurrencyIcon = styled.span`
-  background-color: ${symbols.colors.currency};
-  float: left;
-  min-width: ${symbols.spacing._12};
-  min-height: ${symbols.spacing._14};
-  padding: ${symbols.spacing._2} ${symbols.spacing._4};
-  border-radius: 50%;
-  font-size: ${symbols.font.size._10};
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-export const TimeContainer = styled.div`
-  display: none;
-
-  @media (min-width: ${symbols.media.tabletDevice}) {
-    display: block;
-    display: flex;
-    justify-content: flex-end;
-    flex: 1;
-  }
-`;
-
-export const Time = styled(Caption)`
-  color: ${symbols.font.colors.tertiary};
-`;
-
-export const MediaTime = styled(Time)`
-  @media (min-width: ${symbols.media.tabletDevice}) {
-    display: none;
-  }
 `;

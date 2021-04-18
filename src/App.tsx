@@ -3,7 +3,6 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
 import { Container } from '@material-ui/core';
 
-import './App.css';
 import ViewCountries from './containers/ViewCountries';
 
 const client = new ApolloClient({
