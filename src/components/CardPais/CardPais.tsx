@@ -23,7 +23,7 @@ interface Props {
   population: string | number;
 }
 
-const CountryCard = ({
+const CardPais = ({
   name,
   capital,
   flag,
@@ -64,4 +64,4 @@ const CountryCard = ({
   );
 };
 
-export default CountryCard;
+export default CardPais;

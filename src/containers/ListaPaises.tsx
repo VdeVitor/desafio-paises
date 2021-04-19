@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect, } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import CountryCard from '../components/CountryCard/CountryCard';
+import CardPais from '../components/CardPais/CardPais';
 import { FilterButtonRow } from './styles';
 import MenuButton from '../components/MenuButton/MenuButton';
 import { withApollo, WithApolloClient } from 'react-apollo';
@@ -66,7 +66,7 @@ const COUNTRIES = gql`
   }
 `;
 
-const ViewCountries = ({ client }: WithApolloClient<{}>) => {
+const ListaPaises = ({ client }: WithApolloClient<{}>) => {
   const { loading: initiallyLoading, error, data } = useQuery<Countries>(
     COUNTRIES
   );
@@ -150,7 +150,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
               remove(country._id)
             } else {
             return (
-              <CountryCard
+              <CardPais
                 key={country.name}
                 name={country.name}
                 capital={country.capital}
@@ -171,4 +171,4 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   );
 };
 
-export default withApollo(ViewCountries);
+export default withApollo(ListaPaises);

@@ -2,7 +2,7 @@ import React, { useCallback, useState, useMemo } from 'react';
 import Button from '../Button/Button';
 import { symbols } from '../../themes/symbols';
 import { Menu, MenuItemSeparator, MenuItem } from './styles';
-import { OptionTypes } from '../../containers/ViewCountries';
+import { OptionTypes } from '../../containers/ListaPaises';
 import Icon from '../Icon/Icon';
 
 interface Props {
