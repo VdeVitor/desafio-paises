@@ -126,12 +126,18 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
   }, []);
 
 
+  const remove = (id: any) => {
+    var removeIndex = sortedCountries.map(function(country) { return country._id; }).indexOf(id);
+    sortedCountries.splice(removeIndex, 1);
+  }
+
   return (
     <>
       {!loading && (
         <>
           <FilterButtonRow>
             <h4>Filtro: </h4>
+            <button></button>
             <MenuButton
               listData={SORT_OPTIONS}
               title={selectedSort}
@@ -139,6 +145,10 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
             />
           </FilterButtonRow>
           {sortedCountries.map((country) => {
+            console.log(country)
+            if(country.subregion === null){
+              remove(country._id)
+            } else {
             return (
               <CountryCard
                 key={country.name}
@@ -148,7 +158,7 @@ const ViewCountries = ({ client }: WithApolloClient<{}>) => {
                 subregion={country.subregion.name}
                 population={formatNumber(country.population)}
               />
-            );
+            );}
           })}
         </>
       )}
